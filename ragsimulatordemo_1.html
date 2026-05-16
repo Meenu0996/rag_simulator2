@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RAG Simulator | One-File HTML Demo</title>
+  <style>
+    :root {
+      --bg: #070b14;
+      --panel: rgba(15, 23, 42, 0.78);
+      --panel-2: rgba(2, 6, 23, 0.72);
+      --text: #eaf2ff;
+      --muted: #9eb0d0;
+      --cyan: #2ee9ff;
+      --purple: #a855f7;
+      --green: #3dff9a;
+      --amber: #ffd166;
+      --red: #ff5c8a;
+      --line: rgba(148, 163, 184, 0.22);
+      --shadow: 0 28px 90px rgba(0, 0, 0, 0.45);
+      --radius-xl: 28px;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --font: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      min-height: 100vh;
+      font-family: var(--font);
+      color: var(--text);
+      background:
+        radial-gradient(circle at 10% 10%, rgba(46, 233, 255, 0.2), transparent 30%),
+        radial-gradient(circle at 80% 5%, rgba(168, 85, 247, 0.22), transparent 34%),
+        radial-gradient(circle at 50% 110%, rgba(61, 255, 154, 0.13), transparent 36%),
+        var(--bg);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,0.85), transparent 76%);
+      z-index: -2;
+    }
+
+    .orb {
+      position: fixed;
+      width: 420px;
+      height: 420px;
+      border-radius: 999px;
+      filter: blur(80px);
+      opacity: 0.28;
+      pointer-events: none;
+      z-index: -1;
+      animation: drift 12s ease-in-out infinite alternate;
+    }
+
+    .orb.one { left: -170px; top: 130px; background: var(--cyan); }
+    .orb.two { right: -140px; top: 260px; background: var(--purple); animation-delay: -3s; }
+
+    @keyframes drift {
+      from { transform: translate3d(0, 0, 0) scale(1); }
+      to { transform: translate3d(70px, -45px, 0) scale(1.12); }
+    }
+
+    .app {
+      width: min(1220px, calc(100% - 34px));
+      margin: 28px auto 60px;
+    }
+
+    .hero {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      background: linear-gradient(145deg, rgba(15, 23, 42, 0.82), rgba(2, 6, 23, 0.78));
+      box-shadow: var(--shadow);
+      padding: clamp(24px, 5vw, 46px);
+      overflow: hidden;
+      position: relative;
+      backdrop-filter: blur(22px);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(110deg, transparent, rgba(46, 233, 255, 0.08), transparent 48%);
+      transform: translateX(-100%);
+      animation: scan 8s linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes scan {
+      0% { transform: translateX(-100%); }
+      52%, 100% { transform: translateX(100%); }
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(61, 255, 154, 0.28);
+      background: rgba(61, 255, 154, 0.07);
+      color: var(--green);
+      font-size: 12px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      font-weight: 900;
+      margin-bottom: 18px;
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 18px var(--green);
+      animation: pulse 1.4s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.42; transform: scale(0.72); }
+    }
+
+    h1 {
+      font-size: clamp(42px, 7vw, 86px);
+      line-height: 0.92;
+      letter-spacing: -0.075em;
+      max-width: 980px;
+      margin-bottom: 18px;
+    }
+
+    .gradient-text {
+      background: linear-gradient(90deg, #fff, var(--cyan), var(--purple));
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .subtitle {
+      max-width: 840px;
+      color: #cad7f1;
+      font-size: clamp(17px, 2vw, 22px);
+      line-height: 1.55;
+      margin-bottom: 26px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .hero-chip {
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      background: rgba(2, 6, 23, 0.38);
+      border-radius: 18px;
+      padding: 15px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .hero-chip strong {
+      display: block;
+      color: var(--cyan);
+      font-size: 15px;
+      margin-bottom: 4px;
+    }
+
+    .simulator {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 22px;
+      margin-top: 22px;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(22px);
+      overflow: hidden;
+    }
+
+    .panel-inner { padding: 22px; }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 14px;
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+    }
+
+    .section-title::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(46,233,255,0.58), transparent);
+    }
+
+    textarea,
+    input {
+      width: 100%;
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      border-radius: 16px;
+      background: rgba(2, 6, 23, 0.5);
+      color: var(--text);
+      padding: 14px;
+      font: inherit;
+      outline: none;
+      transition: 0.25s ease;
+    }
+
+    textarea { min-height: 180px; resize: vertical; line-height: 1.5; }
+    input { margin-top: 10px; }
+
+    textarea:focus,
+    input:focus {
+      border-color: rgba(46, 233, 255, 0.75);
+      box-shadow: 0 0 0 4px rgba(46, 233, 255, 0.08);
+    }
+
+    label {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      margin: 15px 0 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .button-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    button {
+      border: 1px solid rgba(46, 233, 255, 0.32);
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.82);
+      color: var(--text);
+      padding: 11px 14px;
+      font-weight: 900;
+      cursor: pointer;
+      transition: 0.24s ease;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      border-color: var(--cyan);
+      box-shadow: 0 0 24px rgba(46, 233, 255, 0.2);
+    }
+
+    button.primary {
+      background: linear-gradient(90deg, rgba(46, 233, 255, 0.18), rgba(168, 85, 247, 0.18));
+    }
+
+    .small-note {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+      margin-top: 12px;
+    }
+
+    .pipeline {
+      display: grid;
+      gap: 14px;
+      padding: 22px;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 64px 1fr;
+      gap: 14px;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: var(--radius-lg);
+      background: linear-gradient(145deg, rgba(2, 6, 23, 0.54), rgba(15, 23, 42, 0.58));
+      padding: 18px;
+      position: relative;
+      overflow: hidden;
+      transition: 0.25s ease;
+    }
+
+    .step.active {
+      border-color: rgba(46, 233, 255, 0.7);
+      box-shadow: 0 0 34px rgba(46, 233, 255, 0.13);
+      transform: translateY(-2px);
+    }
+
+    .step-number {
+      width: 52px;
+      height: 52px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+      font-weight: 950;
+      color: #06111f;
+      background: linear-gradient(135deg, var(--cyan), var(--green));
+      box-shadow: 0 0 24px rgba(46, 233, 255, 0.25);
+    }
+
+    .step h2 {
+      font-size: 20px;
+      letter-spacing: -0.02em;
+      margin-bottom: 5px;
+    }
+
+    .step p {
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 14px;
+    }
+
+    .output {
+      margin-top: 14px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(46, 233, 255, 0.2);
+      background: rgba(46, 233, 255, 0.07);
+      color: #dffbff;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .chunk-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .chunk {
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      border-radius: 14px;
+      padding: 12px;
+      background: rgba(2, 6, 23, 0.38);
+      min-height: 112px;
+    }
+
+    .chunk strong {
+      display: block;
+      color: var(--cyan);
+      font-size: 12px;
+      margin-bottom: 7px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .chunk span {
+      display: block;
+      color: #c9d7f2;
+      font-size: 12.5px;
+      line-height: 1.45;
+    }
+
+    .vector-space {
+      position: relative;
+      height: 260px;
+      border-radius: 18px;
+      background:
+        linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px),
+        rgba(2, 6, 23, 0.4);
+      background-size: 28px 28px;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      overflow: hidden;
+    }
+
+    .vector-point {
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      border-radius: 999px;
+      background: var(--purple);
+      box-shadow: 0 0 18px rgba(168, 85, 247, 0.7);
+      transform: translate(-50%, -50%);
+      cursor: pointer;
+    }
+
+    .vector-point.query {
+      width: 20px;
+      height: 20px;
+      background: var(--green);
+      box-shadow: 0 0 24px rgba(61, 255, 154, 0.9);
+      z-index: 5;
+    }
+
+    .vector-point.selected {
+      background: var(--cyan);
+      box-shadow: 0 0 26px rgba(46, 233, 255, 0.9);
+      animation: selectedPulse 1.2s ease-in-out infinite;
+    }
+
+    @keyframes selectedPulse {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); }
+      50% { transform: translate(-50%, -50%) scale(1.25); }
+    }
+
+    .tooltip {
+      position: absolute;
+      pointer-events: none;
+      background: rgba(2, 6, 23, 0.92);
+      border: 1px solid rgba(46, 233, 255, 0.3);
+      color: var(--text);
+      padding: 8px 10px;
+      border-radius: 10px;
+      font-size: 12px;
+      opacity: 0;
+      transform: translateY(5px);
+      transition: 0.15s ease;
+      max-width: 220px;
+      z-index: 10;
+    }
+
+    .bar-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .bar-item {
+      display: grid;
+      grid-template-columns: 82px 1fr 48px;
+      align-items: center;
+      gap: 10px;
+      color: #c8d6f2;
+      font-size: 12.5px;
+    }
+
+    .bar-track {
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.16);
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--cyan), var(--green));
+      width: 0%;
+      transition: width 0.7s ease;
+    }
+
+    .context-box,
+    .answer-box {
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      border-radius: 16px;
+      background: rgba(2, 6, 23, 0.38);
+      padding: 14px;
+      color: #c9d7f2;
+      line-height: 1.55;
+      font-size: 13.5px;
+      white-space: pre-wrap;
+    }
+
+    .answer-box {
+      border-color: rgba(61, 255, 154, 0.24);
+      background: rgba(61, 255, 154, 0.055);
+    }
+
+    .formula {
+      color: var(--amber);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 12.5px;
+      margin-top: 8px;
+    }
+
+    .legend {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 10px;
+    }
+
+    .legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .legend i {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .doc { background: var(--purple); }
+    .q { background: var(--green); }
+    .sel { background: var(--cyan); }
+
+    .mini-nav {
+      position: sticky;
+      top: 14px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .nav-step {
+      text-align: left;
+      border-radius: 15px;
+      padding: 12px;
+      color: var(--muted);
+      background: rgba(2, 6, 23, 0.28);
+      border: 1px solid rgba(148, 163, 184, 0.16);
+    }
+
+    .nav-step.active {
+      color: var(--text);
+      border-color: rgba(46, 233, 255, 0.55);
+      background: rgba(46, 233, 255, 0.08);
+    }
+
+    .flow-line {
+      height: 34px;
+      display: grid;
+      place-items: center;
+      color: var(--cyan);
+      font-size: 24px;
+      opacity: 0.75;
+    }
+
+    .empty {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+      border: 1px dashed rgba(148, 163, 184, 0.22);
+      border-radius: 14px;
+      padding: 12px;
+    }
+
+    @media (max-width: 980px) {
+      .simulator { grid-template-columns: 1fr; }
+      .mini-nav { position: static; grid-template-columns: repeat(2, 1fr); }
+      .hero-grid, .chunk-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 640px) {
+      .app { width: min(100% - 18px, 1220px); margin-top: 14px; }
+      .hero-grid, .chunk-grid, .mini-nav { grid-template-columns: 1fr; }
+      .step { grid-template-columns: 1fr; }
+      .bar-item { grid-template-columns: 62px 1fr 42px; }
+      h1 { font-size: 44px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="orb one"></div>
+  <div class="orb two"></div>
+
+  <main class="app">
+    <section class="hero">
+      <div class="eyebrow"><span class="dot"></span> Interactive RAG Learning Lab</div>
+      <h1><span class="gradient-text">RAG Simulator</span></h1>
+      <p class="subtitle">Watch how Retrieval-Augmented Generation works: raw knowledge becomes chunks, chunks become vectors, your question becomes a vector, similar chunks are retrieved, and the LLM answers using that context.</p>
+      <div class="hero-grid">
+        <div class="hero-chip"><strong>1. Knowledge Base</strong>Collect and clean source data.</div>
+        <div class="hero-chip"><strong>2. Vector Storage</strong>Chunk text and convert it into embeddings.</div>
+        <div class="hero-chip"><strong>3. Similarity Search</strong>Compare the query vector with stored vectors.</div>
+        <div class="hero-chip"><strong>4. Grounded Answer</strong>Add retrieved context to the LLM prompt.</div>
+      </div>
+    </section>
+
+    <section class="simulator">
+      <aside class="panel">
+        <div class="panel-inner">
+          <div class="section-title">Controls</div>
+          <label for="sourceText">Knowledge Base Text</label>
+          <textarea id="sourceText"></textarea>
+
+          <label for="queryText">User Prompt / Query</label>
+          <input id="queryText" type="text" />
+
+          <div class="button-row">
+            <button class="primary" id="runBtn">Run RAG</button>
+            <button id="resetBtn">Reset Demo</button>
+          </div>
+
+          <p class="small-note">This is a simplified educational simulator. Real RAG systems use production embedding models, vector databases, ranking logic, security filters, prompt templates, and evaluation.</p>
+        </div>
+
+        <div class="panel-inner" style="border-top: 1px solid var(--line);">
+          <div class="section-title">Pipeline Map</div>
+          <nav class="mini-nav" id="miniNav"></nav>
+        </div>
+      </aside>
+
+      <section class="panel">
+        <div class="pipeline" id="pipeline"></div>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const defaultSource = `RAG stands for Retrieval-Augmented Generation. It improves an LLM by giving it relevant external knowledge before it generates an answer.
+
+First, source data is collected and cleaned. This could include documents, tickets, notes, guides, PDFs, emails, or web pages.
+
+The cleaned data is split into smaller chunks. Chunking helps the system retrieve focused pieces of information instead of sending entire documents to the model.
+
+Each chunk is converted into a vector embedding. An embedding is a numeric representation of meaning. Similar ideas usually have vectors that are close together.
+
+The chunks and their embeddings are stored in a vector knowledge base. This is often called a vector database or vector store.
+
+When a user asks a question, the query is also converted into an embedding. The system compares the query vector against stored chunk vectors using similarity search.
+
+The most relevant chunks are retrieved and added as context to the user prompt. The LLM then generates an answer using the retrieved context.
+
+A good RAG answer should be grounded in the retrieved data. If the knowledge base does not contain the answer, the system should say it does not know instead of guessing.`;
+
+    const defaultQuery = "How does RAG use chunks and vectors to answer a question?";
+
+    const steps = [
+      { id: "collect", title: "Collect & Clean Data", summary: "Raw documents are prepared so the system has reliable knowledge to search." },
+      { id: "chunk", title: "Create Chunks", summary: "Large documents are split into smaller, focused passages." },
+      { id: "embed", title: "Create Vector Embeddings", summary: "Each chunk is converted into a simple numeric meaning-vector." },
+      { id: "store", title: "Store in Vector KB", summary: "Chunks and vectors are stored together as a searchable knowledge base." },
+      { id: "query", title: "Embed the User Query", summary: "The user prompt is converted into a query vector too." },
+      { id: "search", title: "Similarity Search", summary: "The query vector is compared with chunk vectors to find the closest matches." },
+      { id: "augment", title: "Add Retrieved Context", summary: "The best matching chunks are placed into the LLM prompt as context." },
+      { id: "generate", title: "Generate Grounded Answer", summary: "The LLM uses the prompt plus context to produce an answer." }
+    ];
+
+    const sourceText = document.getElementById("sourceText");
+    const queryText = document.getElementById("queryText");
+    const pipeline = document.getElementById("pipeline");
+    const miniNav = document.getElementById("miniNav");
+    const runBtn = document.getElementById("runBtn");
+    const resetBtn = document.getElementById("resetBtn");
+
+    sourceText.value = defaultSource;
+    queryText.value = defaultQuery;
+
+    function tokenize(text) {
+      return text
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, " ")
+        .split(/\s+/)
+        .filter(word => word.length > 2);
+    }
+
+    function cleanText(text) {
+      return text
+        .replace(/\s+/g, " ")
+        .replace(/\s([.,!?])/g, "$1")
+        .trim();
+    }
+
+    function makeChunks(text) {
+      const sentences = text
+        .split(/(?<=[.!?])\s+/)
+        .map(cleanText)
+        .filter(Boolean);
+
+      const chunks = [];
+      for (let i = 0; i < sentences.length; i += 2) {
+        chunks.push(sentences.slice(i, i + 2).join(" "));
+      }
+      return chunks;
+    }
+
+    function vectorize(text) {
+      const words = tokenize(text);
+      const dimensions = {
+        data: ["data", "document", "documents", "source", "cleaned", "knowledge", "base", "pdfs", "emails"],
+        chunks: ["chunk", "chunks", "chunking", "split", "smaller", "passages", "focused"],
+        vectors: ["vector", "vectors", "embedding", "embeddings", "numeric", "meaning", "database", "store"],
+        search: ["query", "question", "search", "similarity", "compare", "closest", "retrieved", "relevant"],
+        answer: ["llm", "answer", "generate", "prompt", "context", "grounded", "guessing"]
+      };
+
+      const vector = Object.entries(dimensions).map(([key, terms]) => {
+        const score = words.reduce((sum, word) => sum + (terms.includes(word) ? 1 : 0), 0);
+        return score / Math.max(1, words.length);
+      });
+
+      const magnitude = Math.sqrt(vector.reduce((sum, value) => sum + value * value, 0));
+      return magnitude === 0 ? vector.map(() => 0.01) : vector.map(value => Number((value / magnitude).toFixed(3)));
+    }
+
+    function cosineSimilarity(a, b) {
+      const dot = a.reduce((sum, value, index) => sum + value * b[index], 0);
+      const magA = Math.sqrt(a.reduce((sum, value) => sum + value * value, 0));
+      const magB = Math.sqrt(b.reduce((sum, value) => sum + value * value, 0));
+      if (!magA || !magB) return 0;
+      return dot / (magA * magB);
+    }
+
+    function pointFromVector(vector, index) {
+      const x = 12 + Math.min(76, Math.max(0, ((vector[1] + vector[2] + index * 0.07) * 46)));
+      const y = 12 + Math.min(76, Math.max(0, ((vector[3] + vector[4] + index * 0.06) * 46)));
+      return { x, y };
+    }
+
+    function escapeHtml(value) {
+      return value
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function buildAnswer(query, selectedChunks) {
+      const context = selectedChunks.map(item => item.text).join(" ");
+      const lower = query.toLowerCase();
+
+      if (!selectedChunks.length) {
+        return "I do not have enough retrieved context to answer this question confidently.";
+      }
+
+      if (lower.includes("chunk") || lower.includes("vector") || lower.includes("embedding")) {
+        return "RAG first breaks cleaned knowledge-base content into chunks, then converts each chunk into a vector embedding. When the user asks a question, that question is also converted into a vector. The system compares the query vector with the stored chunk vectors, retrieves the closest matches, adds those chunks as context, and then the LLM generates an answer grounded in that retrieved context.";
+      }
+
+      if (lower.includes("what is rag") || lower.includes("define")) {
+        return "RAG, or Retrieval-Augmented Generation, is a pattern where an LLM retrieves relevant external knowledge before generating an answer. This helps the answer stay grounded in the knowledge base instead of relying only on the model's internal training.";
+      }
+
+      if (context.toLowerCase().includes("does not contain")) {
+        return "A good RAG system should answer from retrieved context. If the needed information is not found in the knowledge base, it should say it does not know instead of guessing.";
+      }
+
+      return "Based on the retrieved context, RAG works by searching a vector knowledge base for relevant chunks and placing those chunks into the prompt before the LLM generates the final answer.";
+    }
+
+    function renderNav(activeIndex = -1) {
+      miniNav.innerHTML = steps.map((step, index) => `
+        <button class="nav-step ${index === activeIndex ? "active" : ""}" onclick="scrollToStep('${step.id}')">
+          ${index + 1}. ${step.title}
+        </button>
+      `).join("");
+    }
+
+    function scrollToStep(id) {
+      const el = document.querySelector(`[data-step="${id}"]`);
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+
+    function renderStep(index, step, content = "") {
+      return `
+        <article class="step" data-step="${step.id}">
+          <div class="step-number">${index + 1}</div>
+          <div>
+            <h2>${step.title}</h2>
+            <p>${step.summary}</p>
+            <div class="output">${content}</div>
+          </div>
+        </article>
+        ${index < steps.length - 1 ? '<div class="flow-line">↓</div>' : ''}
+      `;
+    }
+
+    function renderEmpty() {
+      pipeline.innerHTML = steps.map((step, index) => renderStep(index, step, '<div class="empty">Click <strong>Run RAG</strong> to simulate this step.</div>')).join("");
+      renderNav();
+    }
+
+    function runRag() {
+      const cleaned = cleanText(sourceText.value);
+      const chunks = makeChunks(sourceText.value);
+      const chunkVectors = chunks.map(vectorize);
+      const query = queryText.value.trim() || defaultQuery;
+      const queryVector = vectorize(query);
+      const scored = chunks.map((text, index) => ({
+        id: index + 1,
+        text,
+        vector: chunkVectors[index],
+        score: cosineSimilarity(queryVector, chunkVectors[index])
+      })).sort((a, b) => b.score - a.score);
+      const selected = scored.slice(0, 3);
+      const answer = buildAnswer(query, selected);
+
+      const vectorPoints = scored
+        .slice()
+        .sort((a, b) => a.id - b.id)
+        .map((item, index) => {
+          const point = pointFromVector(item.vector, index);
+          const selectedClass = selected.some(s => s.id === item.id) ? "selected" : "";
+          return `<span class="vector-point ${selectedClass}" style="left:${point.x}%; top:${point.y}%;" data-label="Chunk ${item.id}: similarity ${(item.score * 100).toFixed(0)}%"></span>`;
+        }).join("");
+
+      const queryPoint = pointFromVector(queryVector, 1.5);
+
+      const contents = {
+        collect: `
+          <div class="context-box">${escapeHtml(cleaned.slice(0, 620))}${cleaned.length > 620 ? "..." : ""}</div>
+          <div class="pill-row">
+            <span class="pill">Cleaned whitespace</span>
+            <span class="pill">Removed noise</span>
+            <span class="pill">Prepared for chunking</span>
+          </div>
+        `,
+        chunk: `
+          <div class="chunk-grid">
+            ${chunks.map((chunk, index) => `
+              <div class="chunk">
+                <strong>Chunk ${index + 1}</strong>
+                <span>${escapeHtml(chunk)}</span>
+              </div>
+            `).join("")}
+          </div>
+          <div class="formula">Idea: KB → chunks → focused searchable passages</div>
+        `,
+        embed: `
+          <div class="chunk-grid">
+            ${chunkVectors.map((vector, index) => `
+              <div class="chunk">
+                <strong>Embedding ${index + 1}</strong>
+                <span>[${vector.map(v => v.toFixed(2)).join(", ")}]</span>
+              </div>
+            `).join("")}
+          </div>
+          <div class="formula">Simplified dimensions: [data, chunks, vectors, search, answer]</div>
+        `,
+        store: `
+          <div class="vector-space" id="vectorSpace">
+            ${vectorPoints}
+            <span class="vector-point query" style="left:${queryPoint.x}%; top:${queryPoint.y}%;" data-label="Query vector"></span>
+            <div class="tooltip" id="tooltip"></div>
+          </div>
+          <div class="legend">
+            <span><i class="doc"></i> Stored chunk vectors</span>
+            <span><i class="q"></i> Query vector</span>
+            <span><i class="sel"></i> Retrieved chunks</span>
+          </div>
+        `,
+        query: `
+          <div class="context-box"><strong>User query:</strong> ${escapeHtml(query)}</div>
+          <div class="context-box"><strong>Query embedding:</strong> [${queryVector.map(v => v.toFixed(2)).join(", ")}]</div>
+          <div class="formula">User prompt → embedding → comparable vector</div>
+        `,
+        search: `
+          <div class="bar-list">
+            ${scored.map(item => `
+              <div class="bar-item">
+                <strong>Chunk ${item.id}</strong>
+                <div class="bar-track"><div class="bar-fill" style="width:${Math.max(4, item.score * 100)}%"></div></div>
+                <span>${(item.score * 100).toFixed(0)}%</span>
+              </div>
+            `).join("")}
+          </div>
+          <div class="formula">Higher similarity = more likely to be retrieved</div>
+        `,
+        augment: `
+          <div class="context-box">System prompt: Answer the user using only the retrieved context.\n\nUser question: ${escapeHtml(query)}\n\nRetrieved context:\n${selected.map(item => `- Chunk ${item.id}: ${item.text}`).join("\n")}</div>
+          <div class="formula">Prompt = user question + retrieved chunks + instructions</div>
+        `,
+        generate: `
+          <div class="answer-box">${escapeHtml(answer)}</div>
+          <div class="pill-row">
+            <span class="pill">Grounded in context</span>
+            <span class="pill">Uses retrieved chunks</span>
+            <span class="pill">Less guessing</span>
+          </div>
+        `
+      };
+
+      pipeline.innerHTML = steps.map((step, index) => renderStep(index, step, contents[step.id])).join("");
+      attachTooltips();
+      animateSteps();
+    }
+
+    function animateSteps() {
+      const allSteps = Array.from(document.querySelectorAll(".step"));
+      allSteps.forEach((step, index) => {
+        step.classList.remove("active");
+        setTimeout(() => {
+          allSteps.forEach(s => s.classList.remove("active"));
+          step.classList.add("active");
+          renderNav(index);
+          if (index === allSteps.length - 1) {
+            setTimeout(() => step.classList.remove("active"), 1000);
+          }
+        }, index * 520);
+      });
+    }
+
+    function attachTooltips() {
+      const tooltip = document.getElementById("tooltip");
+      if (!tooltip) return;
+      document.querySelectorAll(".vector-point").forEach(point => {
+        point.addEventListener("mouseenter", () => {
+          tooltip.textContent = point.dataset.label;
+          tooltip.style.opacity = "1";
+        });
+        point.addEventListener("mousemove", e => {
+          const box = point.parentElement.getBoundingClientRect();
+          tooltip.style.left = `${e.clientX - box.left + 12}px`;
+          tooltip.style.top = `${e.clientY - box.top + 12}px`;
+        });
+        point.addEventListener("mouseleave", () => {
+          tooltip.style.opacity = "0";
+        });
+      });
+    }
+
+    runBtn.addEventListener("click", runRag);
+    resetBtn.addEventListener("click", () => {
+      sourceText.value = defaultSource;
+      queryText.value = defaultQuery;
+      renderEmpty();
+    });
+
+    renderEmpty();
+  </script>
+</body>
+</html>
