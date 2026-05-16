@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Saylee Khairnar | Futuristic Resume</title>
+  <style>
+    :root {
+      --bg: #070a12;
+      --panel: rgba(15, 23, 42, 0.72);
+      --panel-strong: rgba(15, 23, 42, 0.92);
+      --text: #e5f0ff;
+      --muted: #98a8c7;
+      --cyan: #37e8ff;
+      --violet: #a855f7;
+      --green: #39ff88;
+      --amber: #ffd166;
+      --border: rgba(148, 163, 184, 0.22);
+      --shadow: 0 20px 70px rgba(0, 0, 0, 0.45);
+      --radius-xl: 28px;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --font-main: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: var(--font-main);
+      background:
+        radial-gradient(circle at top left, rgba(55, 232, 255, 0.2), transparent 30%),
+        radial-gradient(circle at 80% 20%, rgba(168, 85, 247, 0.22), transparent 35%),
+        radial-gradient(circle at 20% 90%, rgba(57, 255, 136, 0.1), transparent 30%),
+        var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent 80%);
+      z-index: -2;
+    }
+
+    .aurora {
+      position: fixed;
+      width: 520px;
+      height: 520px;
+      border-radius: 999px;
+      filter: blur(80px);
+      opacity: 0.32;
+      pointer-events: none;
+      z-index: -1;
+      animation: float 12s ease-in-out infinite alternate;
+    }
+
+    .aurora.one {
+      left: -160px;
+      top: 20vh;
+      background: var(--cyan);
+    }
+
+    .aurora.two {
+      right: -180px;
+      top: 4vh;
+      background: var(--violet);
+      animation-delay: -3s;
+    }
+
+    @keyframes float {
+      from { transform: translate3d(0, 0, 0) scale(1); }
+      to { transform: translate3d(70px, 40px, 0) scale(1.15); }
+    }
+
+    .shell {
+      width: min(1180px, calc(100% - 36px));
+      margin: 34px auto;
+    }
+
+    .top-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    button,
+    .link-button {
+      border: 1px solid rgba(55, 232, 255, 0.28);
+      background: rgba(15, 23, 42, 0.78);
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      transition: 0.25s ease;
+      backdrop-filter: blur(16px);
+      text-decoration: none;
+      font-size: 13px;
+    }
+
+    button:hover,
+    .link-button:hover {
+      transform: translateY(-2px);
+      border-color: var(--cyan);
+      box-shadow: 0 0 28px rgba(55, 232, 255, 0.24);
+    }
+
+    .resume {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      background: linear-gradient(145deg, rgba(15, 23, 42, 0.88), rgba(2, 6, 23, 0.78));
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(24px);
+    }
+
+    .resume::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(110deg, transparent, rgba(55, 232, 255, 0.08), transparent 42%);
+      transform: translateX(-100%);
+      animation: scan 8s linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes scan {
+      0% { transform: translateX(-100%); }
+      55%, 100% { transform: translateX(100%); }
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 28px;
+      padding: 42px;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      color: var(--green);
+      border: 1px solid rgba(57, 255, 136, 0.28);
+      background: rgba(57, 255, 136, 0.07);
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      margin-bottom: 18px;
+    }
+
+    .pulse-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 18px var(--green);
+      animation: pulse 1.6s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.45; transform: scale(0.75); }
+    }
+
+    h1 {
+      font-size: clamp(42px, 7vw, 82px);
+      line-height: 0.9;
+      letter-spacing: -0.07em;
+      margin-bottom: 18px;
+    }
+
+    .gradient-text {
+      background: linear-gradient(90deg, #ffffff, var(--cyan), var(--violet));
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .headline {
+      max-width: 780px;
+      color: #d7e4ff;
+      font-size: clamp(18px, 2vw, 24px);
+      line-height: 1.45;
+      margin-bottom: 24px;
+    }
+
+    .contact-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      color: var(--muted);
+      background: rgba(2, 6, 23, 0.34);
+      font-size: 13px;
+    }
+
+    .hero-card {
+      border: 1px solid rgba(55, 232, 255, 0.2);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      background: linear-gradient(160deg, rgba(55, 232, 255, 0.1), rgba(168, 85, 247, 0.08));
+      position: relative;
+      overflow: hidden;
+    }
+
+    .score {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .metric {
+      min-height: 100px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      background: rgba(2, 6, 23, 0.35);
+      padding: 16px;
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 28px;
+      color: var(--cyan);
+      letter-spacing: -0.04em;
+      margin-bottom: 5px;
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .main {
+      display: grid;
+      grid-template-columns: 0.72fr 1.28fr;
+      gap: 28px;
+      padding: 34px 42px 42px;
+    }
+
+    section {
+      margin-bottom: 26px;
+    }
+
+    .panel {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      background: rgba(15, 23, 42, 0.5);
+      padding: 24px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 16px;
+      font-size: 14px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #ffffff;
+    }
+
+    .section-title::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(55, 232, 255, 0.5), transparent);
+    }
+
+    .summary {
+      color: #c8d6f3;
+      line-height: 1.72;
+      font-size: 15px;
+    }
+
+    .skills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+    }
+
+    .skill {
+      padding: 9px 11px;
+      border-radius: 12px;
+      background: rgba(55, 232, 255, 0.08);
+      border: 1px solid rgba(55, 232, 255, 0.17);
+      color: #d8fbff;
+      font-size: 12.5px;
+      font-weight: 700;
+    }
+
+    .timeline {
+      position: relative;
+      padding-left: 22px;
+    }
+
+    .timeline::before {
+      content: "";
+      position: absolute;
+      left: 5px;
+      top: 8px;
+      bottom: 8px;
+      width: 1px;
+      background: linear-gradient(var(--cyan), var(--violet), transparent);
+    }
+
+    .item {
+      position: relative;
+      padding: 0 0 24px;
+    }
+
+    .item:last-child {
+      padding-bottom: 0;
+    }
+
+    .item::before {
+      content: "";
+      position: absolute;
+      left: -22px;
+      top: 6px;
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: var(--bg);
+      border: 2px solid var(--cyan);
+      box-shadow: 0 0 16px rgba(55, 232, 255, 0.8);
+    }
+
+    .item-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 8px;
+    }
+
+    h2 {
+      font-size: 19px;
+      letter-spacing: -0.02em;
+    }
+
+    .role-meta {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    .tag {
+      white-space: nowrap;
+      color: var(--amber);
+      border: 1px solid rgba(255, 209, 102, 0.22);
+      background: rgba(255, 209, 102, 0.06);
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    ul {
+      list-style: none;
+      display: grid;
+      gap: 9px;
+      margin-top: 12px;
+    }
+
+    li {
+      color: #c6d3ee;
+      line-height: 1.55;
+      font-size: 14.5px;
+      position: relative;
+      padding-left: 18px;
+    }
+
+    li::before {
+      content: "›";
+      position: absolute;
+      left: 0;
+      color: var(--cyan);
+      font-weight: 900;
+    }
+
+    .project-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    .project {
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      background: rgba(2, 6, 23, 0.28);
+      padding: 16px;
+    }
+
+    .project h3 {
+      font-size: 15px;
+      margin-bottom: 7px;
+      color: #ffffff;
+    }
+
+    .project p {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .certs,
+    .education-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .compact-card {
+      border-left: 2px solid var(--cyan);
+      padding-left: 12px;
+      color: #c8d6f3;
+      line-height: 1.45;
+      font-size: 14px;
+    }
+
+    .compact-card strong {
+      display: block;
+      color: #ffffff;
+      margin-bottom: 3px;
+    }
+
+    .print-note {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 12px;
+      line-height: 1.5;
+    }
+
+    .highlight-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .highlight {
+      border-radius: 16px;
+      background: rgba(2, 6, 23, 0.34);
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      padding: 14px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .highlight strong {
+      display: block;
+      color: var(--green);
+      font-size: 14px;
+      margin-bottom: 5px;
+    }
+
+    .mode-toggle {
+      display: none;
+    }
+
+    @media (max-width: 920px) {
+      .hero,
+      .main {
+        grid-template-columns: 1fr;
+        padding: 28px;
+      }
+
+      .project-grid,
+      .highlight-bar {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .shell {
+        width: min(100% - 18px, 1180px);
+        margin: 16px auto;
+      }
+
+      .top-actions {
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .score {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 44px;
+      }
+
+      .item-header {
+        flex-direction: column;
+      }
+
+      .tag {
+        white-space: normal;
+      }
+    }
+
+    @media print {
+      body {
+        background: #ffffff;
+        color: #111827;
+      }
+
+      body::before,
+      .aurora,
+      .top-actions,
+      .resume::before {
+        display: none !important;
+      }
+
+      .shell {
+        width: 100%;
+        margin: 0;
+      }
+
+      .resume,
+      .panel,
+      .hero-card,
+      .metric,
+      .project,
+      .highlight {
+        box-shadow: none;
+        background: #ffffff;
+        border-color: #d1d5db;
+        color: #111827;
+      }
+
+      .resume {
+        border-radius: 0;
+      }
+
+      .gradient-text,
+      h1,
+      h2,
+      .project h3,
+      .compact-card strong,
+      .section-title {
+        color: #111827 !important;
+        background: none;
+        -webkit-text-fill-color: initial;
+      }
+
+      .headline,
+      .summary,
+      li,
+      .role-meta,
+      .chip,
+      .project p,
+      .compact-card,
+      .print-note,
+      .highlight {
+        color: #374151;
+      }
+
+      .main {
+        grid-template-columns: 0.78fr 1.22fr;
+      }
+
+      .hero,
+      .main {
+        padding: 22px 28px;
+      }
+
+      button {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="aurora one"></div>
+  <div class="aurora two"></div>
+
+  <main class="shell">
+    <div class="top-actions">
+      <button id="focusMode">Focus Mode</button>
+      <button onclick="window.print()">Print / Save PDF</button>
+    </div>
+
+    <article class="resume" id="resume">
+      <header class="hero">
+        <div>
+          <div class="eyebrow"><span class="pulse-dot"></span> Healthcare IT · Product · Program Delivery</div>
+          <h1><span class="gradient-text">Saylee Khairnar</span></h1>
+          <p class="headline">Healthcare IT Project Manager & Business Analyst turning complex EHR, data migration, ROI, and legacy viewer initiatives into scalable, client-ready product outcomes.</p>
+          <div class="contact-grid">
+            <span class="chip">📍 Dallas–Fort Worth, TX</span>
+            <span class="chip">✉️ sk09.info@gmail.com</span>
+            <span class="chip">🔗 LinkedIn: Add URL</span>
+            <span class="chip">🏷️ PMP · CSM · MS Information Systems</span>
+          </div>
+          <div class="highlight-bar">
+            <div class="highlight"><strong>130+ clinics</strong>MEDITECH Expanse implementation support across ambulatory POD go-lives.</div>
+            <div class="highlight"><strong>Healthcare platforms</strong>MEDITECH, Galactica, EHRViewer, HISView, EDM, Access eForms.</div>
+            <div class="highlight"><strong>Product focus</strong>ROI portals, admin tools, dashboards, workflows, UAT, SOWs.</div>
+            <div class="highlight"><strong>Delivery style</strong>Agile, stakeholder alignment, client communication, measurable execution.</div>
+          </div>
+        </div>
+
+        <aside class="hero-card">
+          <div class="section-title">Profile Signal</div>
+          <p class="summary">Hybrid delivery leader with a strong bridge between business requirements, healthcare operations, technical teams, and executive stakeholders.</p>
+          <div class="score">
+            <div class="metric"><strong>8+</strong><span>Healthcare IT, project delivery, product, BA, and implementation exposure</span></div>
+            <div class="metric"><strong>Agile</strong><span>Scrum ceremonies, DevOps backlogs, user stories, acceptance criteria</span></div>
+            <div class="metric"><strong>EHR</strong><span>MEDITECH Expanse Ambulatory & Acute ecosystem knowledge</span></div>
+            <div class="metric"><strong>Data</strong><span>SQL, Power BI, Excel, dashboards, operational metrics</span></div>
+          </div>
+        </aside>
+      </header>
+
+      <div class="main">
+        <aside>
+          <section class="panel">
+            <div class="section-title">Core Stack</div>
+            <div class="skills">
+              <span class="skill">MEDITECH Expanse</span>
+              <span class="skill">Galactica</span>
+              <span class="skill">EHRViewer</span>
+              <span class="skill">HISView</span>
+              <span class="skill">EDM</span>
+              <span class="skill">Access eForms</span>
+              <span class="skill">Azure DevOps</span>
+              <span class="skill">Jira</span>
+              <span class="skill">Power BI</span>
+              <span class="skill">SQL / T-SQL</span>
+              <span class="skill">SSRS</span>
+              <span class="skill">Excel</span>
+              <span class="skill">Tableau</span>
+              <span class="skill">MS Project</span>
+              <span class="skill">SAP Exposure</span>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="section-title">Strengths</div>
+            <ul>
+              <li>Healthcare IT implementation planning and go-live readiness</li>
+              <li>Requirements discovery, workflow mapping, and gap analysis</li>
+              <li>SOW creation, estimation support, scope control, and delivery tracking</li>
+              <li>Client-facing communication, QA summaries, and deployment notices</li>
+              <li>Legacy system migration, data conversion, scanning, and document archiving</li>
+              <li>Backlog grooming, user stories, acceptance criteria, and UAT coordination</li>
+            </ul>
+          </section>
+
+          <section class="panel">
+            <div class="section-title">Certifications</div>
+            <div class="certs">
+              <div class="compact-card"><strong>Project Management Professional</strong>PMP · Dec 2023</div>
+              <div class="compact-card"><strong>Certified Scrum Master</strong>CSM · Jun 2023</div>
+              <div class="compact-card"><strong>Business Analytics Certification</strong>University of Texas at Arlington</div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="section-title">Education</div>
+            <div class="education-list">
+              <div class="compact-card"><strong>MS, Information Systems</strong>University of Texas at Arlington · 2021–2023</div>
+            </div>
+          </section>
+        </aside>
+
+        <div>
+          <section class="panel">
+            <div class="section-title">Executive Summary</div>
+            <p class="summary">Healthcare IT Project Manager and Business Analyst with experience delivering EHR implementation, legacy data conversion, document archiving, ROI workflows, downtime viewer solutions, and healthcare product enhancements. Known for translating ambiguous business needs into actionable requirements, user stories, SOWs, QA plans, deployment communications, and executive-ready status updates. Strong background working across MEDITECH Expanse environments, Galactica, EHRViewer/HISView, scanning workflows, and cross-functional technical teams.</p>
+          </section>
+
+          <section class="panel">
+            <div class="section-title">Experience</div>
+            <div class="timeline">
+              <div class="item">
+                <div class="item-header">
+                  <div>
+                    <h2>Healthcare IT Project Manager / Business Analyst</h2>
+                    <div class="role-meta">MondoTech LLC / The Shams Group · Irving, TX</div>
+                  </div>
+                  <span class="tag">Healthcare IT Delivery</span>
+                </div>
+                <ul>
+                  <li>Led and supported MEDITECH Expanse implementation initiatives across 130+ ambulatory clinics, coordinating POD-based go-lives, readiness activities, ATE support, issue triage, and post go-live optimization.</li>
+                  <li>Owned requirements discovery, workflow documentation, backlog definition, stakeholder alignment, and UAT coordination for healthcare solutions spanning ROI, document archiving, legacy viewers, scanning, and integration workflows.</li>
+                  <li>Created client-ready SOWs, deployment communications, QA readouts, project plans, user guides, and executive summaries for technical and operational audiences.</li>
+                  <li>Partnered with developers, database teams, HIM, clinic operations, and client leadership to resolve integration, access, reporting, and document visibility issues across Galactica, EDM, HISView, EHRViewer, and MEDITECH Expanse.</li>
+                  <li>Used Azure DevOps, Jira, Excel, Power BI, SQL, and reporting tools to manage delivery progress, convert requirements into user stories, track defects, monitor scanning metrics, and support decision-making.</li>
+                </ul>
+              </div>
+
+              <div class="item">
+                <div class="item-header">
+                  <div>
+                    <h2>Product & Implementation Lead — DRM / ROI Admin Portal</h2>
+                    <div class="role-meta">The Shams Group · Client-facing product delivery</div>
+                  </div>
+                  <span class="tag">Product Ownership</span>
+                </div>
+                <ul>
+                  <li>Managed requirements and feature definition for DRM Admin Portal capabilities including requestor types, facilities, hold statuses, users, roles, permissions, dictionary visibility, and audit reporting needs.</li>
+                  <li>Translated ROI operational workflows into portal requirements with validations, active/inactive controls, delivery modes, tiered fee structures, search grids, and synchronization needs.</li>
+                  <li>Coordinated test/live deployment planning across AstroETL-V and Galactica environments while communicating risk, expected impact, validation needs, and rollback approach.</li>
+                </ul>
+              </div>
+
+              <div class="item">
+                <div class="item-header">
+                  <div>
+                    <h2>Legacy Data Conversion & Viewer Solutions Analyst</h2>
+                    <div class="role-meta">Healthcare data migration, downtime, and archiving initiatives</div>
+                  </div>
+                  <span class="tag">Migration Strategy</span>
+                </div>
+                <ul>
+                  <li>Supported legacy system assessment and migration planning for systems such as TermScan Web and Athena Health data into Galactica and legacy viewer environments.</li>
+                  <li>Defined document type strategy, metadata needs, linking approach, patient/account matching considerations, exception handling, and validation workflows for migration projects.</li>
+                  <li>Collaborated with SMEs and technical teams to assess source data, confirm scope, identify missing records, structure estimation, and create phased delivery plans.</li>
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="section-title">Selected Projects</div>
+            <div class="project-grid">
+              <div class="project">
+                <h3>MEDITECH Expanse Ambulatory Rollout</h3>
+                <p>Supported implementation, training, issue triage, data conversion, and go-live operations across large-scale clinic deployment waves.</p>
+              </div>
+              <div class="project">
+                <h3>DRM Admin Portal</h3>
+                <p>Defined portal workflows for requestor types, facilities, hold statuses, permissions, audit needs, and ROI administration.</p>
+              </div>
+              <div class="project">
+                <h3>Rabies Vaccination Extraction</h3>
+                <p>Scoped automated document identification, extraction, account-level linking, Galactica posting, and MEDITECH display workflow.</p>
+              </div>
+              <div class="project">
+                <h3>Athena Health to Galactica Migration</h3>
+                <p>Structured analysis for 12K+ clinical documents and 2K+ CCDA records, including metadata, document type, and viewer strategy.</p>
+              </div>
+              <div class="project">
+                <h3>EHRViewer / HISView Optimization</h3>
+                <p>Supported access, document visibility, report link, and environment troubleshooting across downtime and legacy viewer solutions.</p>
+              </div>
+              <div class="project">
+                <h3>HR File QA Worklist</h3>
+                <p>Analyzed worklist behavior, QA statuses, filtering logic, correction workflows, and operational dashboard needs.</p>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </article>
+  </main>
+
+  <script>
+    const resume = document.getElementById('resume');
+    const focusButton = document.getElementById('focusMode');
+    let focus = false;
+
+    focusButton.addEventListener('click', () => {
+      focus = !focus;
+      document.body.classList.toggle('focus', focus);
+      focusButton.textContent = focus ? 'Full Design Mode' : 'Focus Mode';
+
+      if (focus) {
+        resume.style.background = 'rgba(7, 10, 18, 0.96)';
+        document.querySelectorAll('.aurora').forEach(el => el.style.opacity = '0.12');
+      } else {
+        resume.style.background = '';
+        document.querySelectorAll('.aurora').forEach(el => el.style.opacity = '0.32');
+      }
+    });
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.animate([
+            { opacity: 0, transform: 'translateY(14px)' },
+            { opacity: 1, transform: 'translateY(0)' }
+          ], {
+            duration: 650,
+            easing: 'cubic-bezier(.2,.8,.2,1)',
+            fill: 'both'
+          });
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll('.panel, .hero-card, .highlight').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>
